@@ -39,7 +39,6 @@ int g_InitWndHeight = -1;
 TwCopyCDStringToClient	g_InitCopyCDStringToClient = NULL;
 TwCopyStdStringToClient g_InitCopyStdStringToClient = NULL;
 float g_FontScaling = 1.0f;
-bool _D3D = true;
 
 // multi-windows
 const int TW_MASTER_WINDOW_ID = 0;
@@ -1858,19 +1857,20 @@ int ANT_CALL TwInit(ETwGraphAPI _GraphAPI, void *_Device)
 	g_TwMasterMgr = new CTwMgr(_GraphAPI, _Device, TW_MASTER_WINDOW_ID);
 	g_Wnds[TW_MASTER_WINDOW_ID] = g_TwMasterMgr;
 	g_TwMgr = g_TwMasterMgr;
-	
+
+	bool isD3d = true;
 	switch( _GraphAPI )
 	{
 		case TW_OPENGL:
 		case TW_OPENGL_CORE:
-			_D3D = false;
+			isD3d = false;
 			break;
 		default:
-			_D3D = true;
+			isD3d = true;
 			break;
 	}
 
-	TwGenerateDefaultFonts(g_FontScaling, _D3D);
+	TwGenerateDefaultFonts(g_FontScaling, isD3d);
 	g_TwMasterMgr->m_CurrentFont = g_DefaultNormalFont;
 
 	int Res = 0;
@@ -5806,7 +5806,7 @@ int ANT_CALL TwKeyTest(int _Key, int _Modifiers)
 
 namespace AntTweakBar {
 
-struct StructCompare : public binary_function<TwType, TwType, bool>
+struct StructCompare : public is_function<bool (TwType, TwType)>
 {
 	bool operator()(const TwType& _Left, const TwType& _Right) const
 	{
